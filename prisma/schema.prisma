@@ -26,6 +26,8 @@ model Account {
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
+  // this is a block level attribute that is called uniqueness which means that there cannot have two accoutns with the same provider and providerAccountId
+  // parent model typically would have the primary key(id) while child model would have the foreign key (userId)
   @@unique([provider, providerAccountId])
 }
 
@@ -34,6 +36,7 @@ model Session {
   sessionToken String   @unique
   userId       String
   expires      DateTime
+  // onDelete: Cascade here means that if the user( in this case will act as the parent model ) is deleted, then the session ( in this case would act as the child model ) will also be deleted
   user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
 

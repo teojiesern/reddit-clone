@@ -1,4 +1,4 @@
-import { NextAuthOptions } from "next-auth";
+import { NextAuthOptions, getServerSession } from "next-auth";
 import { db } from "./db";
 import { PrismaAdapter } from "@next-auth/prisma-adapter";
 import GoogleProvider from "next-auth/providers/google";
@@ -16,8 +16,14 @@ export const authOptions: NextAuthOptions = {
         GoogleProvider({
             clientId: process.env.GOOGLE_CLIENT_ID!,
             clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+            authorization: {
+                params: {
+                    prompt: "select_account",
+                },
+            },
         }),
     ],
+    // jwt runs first in which we can add custom things in which we want to be stored in the token, which will then be passed to the session callback and from there we would manipulate the session object to have the output that we want since the session is the thing that will be passed to the browser
     callbacks: {
         async session({ token, session }) {
             if (token) {
@@ -32,6 +38,8 @@ export const authOptions: NextAuthOptions = {
         },
 
         async jwt({ token, user }) {
+            // the token attribute follows the user model excluding relations
+            // the user attribute follows what provider we are using
             const dbUser = await db.user.findFirst({
                 where: {
                     email: token.email,
@@ -67,3 +75,5 @@ export const authOptions: NextAuthOptions = {
         },
     },
 };
+
+export const getAuthSession = () => getServerSession(authOptions);
