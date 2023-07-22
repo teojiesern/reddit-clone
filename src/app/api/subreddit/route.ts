@@ -44,7 +44,7 @@ export async function POST(req: Request) {
             },
         });
 
-        return new NextResponse(subreddit.name + "created");
+        return new NextResponse(subreddit.name);
     } catch (error) {
         // here the error could be anything from the zod error(input does not follow the format) to the prisma error(db create or query error), so we will have some if else statements to catch all those error and return the appropriate responses
         if (error instanceof z.ZodError) {
