@@ -4,20 +4,31 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
+import axios, { AxiosError } from "axios";
+import { CreateSubredditPayload } from "@/lib/validators/subreddit";
 
 export default function page() {
     const [input, setInput] = useState<string>("");
     const router = useRouter();
 
-    const a = useQuery({
-        queryFn: async () => {
-            const res = await fetch(
-                "https://jsonplaceholder.typicode.com/posts"
-            );
-            const data = await res.json();
-            return data
+    const { isLoading, mutate } = useMutation({
+        mutationFn: async () => {
+            // here we are just specifying that the input must be a string, we did not validate using the validator that we created yet
+            const payload: CreateSubredditPayload = {
+                name: input,
+            };
+
+            const { data } = await axios.post("/api/subreddit", payload);
+            return data as string;
         },
+        onError: (err) => {
+            if(err instanceof AxiosError){
+                if(err.response?.status === 409){
+                    
+                }
+            }
+        }
     });
 
     return (
@@ -59,7 +70,14 @@ export default function page() {
                     >
                         Cancel
                     </Button>
-                    <Button>Create Community</Button>
+                    {/* the button is disabled when the user has not input anything */}
+                    <Button
+                        isLoading={isLoading}
+                        disabled={input.length === 0}
+                        onClick={() => mutate()}
+                    >
+                        Create Community
+                    </Button>
                 </div>
             </div>
         </div>
