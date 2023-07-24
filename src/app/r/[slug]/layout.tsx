@@ -1,6 +1,9 @@
+import SubscribeLeaveToggle from "@/components/SubscribeLeaveToggle";
+import { buttonVariants } from "@/components/ui/Button";
 import { getAuthSession } from "@/lib/auth";
 import { db } from "@/lib/db";
 import { format } from "date-fns";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 
 const Layout = async ({
@@ -38,7 +41,7 @@ const Layout = async ({
               },
           });
 
-    // convertiong truthy or falsy value to boolean
+    // converting truthy or falsy value to boolean
     const isSubscribed = !!subscription;
 
     const memberCount = await db.subscription.count({
@@ -71,6 +74,7 @@ const Layout = async ({
                             <div className="flex justify-between gap-x-4 py-3">
                                 <dt className="text-gray-500">Created</dt>
                                 <dt className="text-gray-700">
+                                    {/* this time tag is used for better search engine optimization by passing in the dateTime prop, and this prop only receives a string which must also be a valid dateTime, see mdn doc for more info, toString converts the date into string of dateTime which an example would be "Wed Jul 21 2023 15:30:00 GMT+0530 (India Standard Time)". In this case it is not a valid format for the dateTime, however toDateString converts it to contain only the date information for example "Wed Jul 21 2023" in which is a valid format*/}
                                     <time
                                         dateTime={subreddit.createdAt.toDateString()}
                                     >
@@ -81,6 +85,41 @@ const Layout = async ({
                                     </time>
                                 </dt>
                             </div>
+
+                            <div className="flex justify-between gap-x-4 py-3">
+                                <dt className="text-gray-500">Members</dt>
+                                <dt className="text-gray-700">
+                                    <div className="text-gray-900">
+                                        {memberCount}
+                                    </div>
+                                </dt>
+                            </div>
+
+                            {subreddit.creatorId === session?.user?.id ? (
+                                <div className="flex justify-between gap-x-4 py-3">
+                                    <p className="text-gray-500">
+                                        You created this community
+                                    </p>
+                                </div>
+                            ) : null}
+
+                            {subreddit.creatorId !== session?.user?.id ? (
+                                <SubscribeLeaveToggle
+                                    subredditId={subreddit.id}
+                                    subredditName={subreddit.name}
+                                    isSubscribed={isSubscribed}
+                                />
+                            ) : null}
+
+                            <Link
+                                className={buttonVariants({
+                                    variant: "outline",
+                                    className: "w-full mb-6",
+                                })}
+                                href={`/r/${slug}/submit`}
+                            >
+                                Create Post
+                            </Link>
                         </dl>
                     </div>
                 </div>
