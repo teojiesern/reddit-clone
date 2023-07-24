@@ -1,9 +1,13 @@
 "use client";
 import TextareaAutosize from "react-textarea-autosize";
 import {useForm} from "react-hook-form";
+import { PostCreationRequest } from "@/lib/validators/post";
+import { zodResolver } from "@hookform/resolvers/zod";
 
 export default function Editor() {
-    const {} = useForm
+    const {} = useForm<PostCreationRequest>({
+        resolver: zodResolver(PostCreationRequest),
+    })
 
     return (
         <div className="w-full p-4 bg-zinc-50 rounded-lg border border-zinc-200">
