@@ -32,7 +32,7 @@ export default async function page({ params: { slug } }: submitProps) {
             </div>
 
             {/* form */}
-            <Editor />
+            <Editor subredditId={subreddit.id} />
 
             <div className="w-full flex justify-end">
                 {/*the form prop here means that this button will be the button that will submit the form with the id subreddit-post-form*/}
