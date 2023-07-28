@@ -1,6 +1,7 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import { SessionProvider } from "next-auth/react";
 
 // passing the context using tanstack query is not as easy as slamming the queryClientProvider into the layout in nextjs, instead we will have to follow this approach
 // tanstack query needs this context provider to work properly
@@ -9,7 +10,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
     const queryClient = new QueryClient();
     return (
         <QueryClientProvider client={queryClient}>
-            {children}
+            <SessionProvider>{children}</SessionProvider>
         </QueryClientProvider>
     );
 }
