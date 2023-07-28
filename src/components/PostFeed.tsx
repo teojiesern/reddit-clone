@@ -64,7 +64,8 @@ export default function PostFeed({
                 const votesAmt = post.votes.reduce(
                     (acc: number, vote: Vote) => {
                         if (vote.type === "UP") return acc + 1;
-                        return acc - 1;
+                        if (vote.type === "DOWN") acc - 1;
+                        return acc;
                     },
                     0
                 );
