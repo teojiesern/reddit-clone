@@ -32,6 +32,9 @@ export default async function page({ params: { slug } }: Props) {
                 // here we are specifying how many of the post that we want to take instead of taking all of them because for those that are taken here will be straight away rendered on the page, which if the post is too much this would be an issue. Note that we are specifying this take in the posts because the post are the things that we want to limit
                 // since we will be needing this value in multiple places, we would want to store this in a global config file
                 take: INFINITE_SCROLLING_PAGINATION_RESULTS,
+                orderBy: {
+                    createdAt: "desc",
+                },
             },
         },
     });

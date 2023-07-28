@@ -6,7 +6,7 @@ import { Vote } from "@prisma/client";
 import { useInfiniteQuery } from "@tanstack/react-query";
 import axios from "axios";
 import { useSession } from "next-auth/react";
-import { useRef } from "react";
+import { useEffect, useRef } from "react";
 import Post from "./Post";
 
 interface PostFeedProps {
@@ -22,6 +22,7 @@ export default function PostFeed({
     const lastPostRef = useRef<HTMLElement>(null);
     // the ref here is the element that act as the observed target while the root is the viewport that we are going to use to observe the target
     const { ref, entry } = useIntersection({
+        // here we create the lastPostRef so that if we want to put it as a reference it will be easier in the near future but now the lastPostRef.current will always be null and mantine hook states that if the root is set to null, the default viewport will be set as the root
         root: lastPostRef.current,
         threshold: 1,
     });
@@ -34,7 +35,8 @@ export default function PostFeed({
         queryFn: async ({ pageParam = 1 }) => {
             !!subredditName ? `&subredditName=${subredditName}` : ``;
             const { data } = await axios.get(
-                `/api/posts?limit=${INFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}`
+                `/api/posts?limit=${INFINITE_SCROLLING_PAGINATION_RESULTS}&page=${pageParam}` +
+                    (!!subredditName ? `&subredditName=${subredditName}` : ``)
             );
 
             // since we awaited this get request, the thing that we return back to the data will be the data that we want instead of the response and we typeacast it to the ExtendedPost type
@@ -48,6 +50,10 @@ export default function PostFeed({
             pageParams: [1],
         },
     });
+
+    useEffect(() => {
+        if (entry?.isIntersecting) fetchNextPage();
+    }, [entry, fetchNextPage]);
 
     // here states that if there is no data yet, which will happen at first when the data is not yet been fetched, we will assign the posts to the initial posts. Therefore after mapping through the data.pages, we will straight away get our posts
     const posts = data?.pages.flatMap((page) => page) ?? initialPosts;
